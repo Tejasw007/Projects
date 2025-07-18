@@ -1,3 +1,3 @@
 # Projects
-This is my first GIT REPOSITORY
+This is my first GIT REPOSITORY.
 Author - Tejasw.s
