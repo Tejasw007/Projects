@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teacher Authentication - Student Attendance Manager</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fstudentat4754back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.8"></script>
+</head>
+<body class="min-h-screen bg-background">
+    <!-- Global Header -->
+    <header class="bg-surface shadow-custom-sm border-b border-secondary-200">
+        <div class="max-width-8xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo and Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                        <svg class="h-8 w-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-semibold text-text-primary">Student Attendance Manager</h1>
+                        <p class="text-sm text-text-secondary">QR Code Based Attendance System</p>
+                    </div>
+                </div>
+                
+                <!-- Current Date/Time Display -->
+                <div class="hidden sm:block">
+                    <div class="text-sm text-text-secondary">
+                        <span id="currentDateTime">August 30, 2025 - 5:13 PM</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb Navigation -->
+    <nav class="bg-secondary-50 border-b border-secondary-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center space-x-2 py-3 text-sm">
+                <a href="role_selection_landing.html" class="text-text-secondary hover:text-primary transition-colors">
+                    Home
+                </a>
+                <svg class="w-4 h-4 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+                <span class="text-primary font-medium">Teacher Portal</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 py-12 lg:py-16">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Page Title -->
+            <div class="text-center mb-8">
+                <h2 class="text-3xl lg:text-4xl font-semibold text-text-primary mb-4">
+                    Teacher Authentication
+                </h2>
+                <p class="text-lg text-text-secondary">
+                    Select your subject and authenticate to access attendance management tools
+                </p>
+            </div>
+
+            <!-- Authentication Form Card -->
+            <div class="card max-w-lg mx-auto">
+                <form id="authForm" class="space-y-6">
+                    <!-- Subject Selection -->
+                    <div>
+                        <label for="subject" class="block text-sm font-medium text-text-primary mb-2">
+                            Select Subject
+                        </label>
+                        <div class="relative">
+                            <select id="subject" name="subject" class="input-field appearance-none pr-10" required>
+                                <option value>Choose a subject...</option>
+                                <option value="MAC"> MAC</option>
+                                <option value="CC">CC</option>
+                                <option value="UHV">UHV</option>
+                                <option value="EP LAB">EP LAB</option>
+                                <option value="IC"> IC</option>
+                                <option value="IPS">IPS</option>
+                                <option value="EECT">EECT</option>
+                                <option value="LIB">LIB</option>
+                                <option value="MM">MM</option>
+                                <option value="CA">CA</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <svg class="w-5 h-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password Input -->
+                    <div id="passwordSection" class="opacity-50 transition-opacity duration-300">
+                        <label for="password" class="block text-sm font-medium text-text-primary mb-2">
+                            Subject Password
+                        </label>
+                        <div class="relative">
+                            <input type="password" id="password" name="password" class="input-field pr-10" placeholder="Enter subject password" disabled required />
+                            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-secondary-400 hover:text-text-primary transition-colors" disabled>
+                                <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="text-xs text-text-secondary mt-1">
+                            Password is required to access subject-specific attendance tools
+                        </p>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="alert-error hidden">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span id="errorText">Invalid password. Please try again.</span>
+                        </div>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div id="successMessage" class="alert-success hidden">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Authentication successful! You may change the subject password or continue.</span>
+                        </div>
+                    </div>
+
+                    <!-- Post-auth actions (shown after successful login; user chooses whether to change password) -->
+                    <div id="postAuthActions" class="mt-4 hidden">
+                        <div class="flex items-center justify-between">
+                            <button type="button" id="changePwdActionBtn" class="btn-ghost px-4 py-2">Change Password</button>
+                            <button type="button" id="continueBtn" class="btn-primary px-4 py-2">Continue to Management</button>
+                        </div>
+                        <p class="text-xs text-text-secondary mt-2">You can update the password for this subject now, or continue to the QR generation/management console.</p>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" id="submitBtn" class="btn-primary w-full py-3 text-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <span id="submitText">Access Subject</span>
+                        <svg id="loadingSpinner" class="w-5 h-5 ml-2 loading-spinner hidden" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- Back to Role Selection -->
+                <div class="mt-6 pt-6 border-t border-secondary-200">
+                    <a href="role_selection_landing.html" class="flex items-center justify-center text-text-secondary hover:text-primary transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Back to Role Selection
+                    </a>
+                </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="mt-12 max-w-lg mx-auto">
+                <div class="bg-primary-50 rounded-lg p-6 border border-primary-100">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-primary mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <div>
+                            <h3 class="text-sm font-semibold text-primary mb-2">Need Help?</h3>
+                            <p class="text-sm text-primary-700 mb-3">
+                                Each subject has a unique password for security. Contact your administrator if you've forgotten your subject password.
+                            </p>
+                            <ul class="text-xs text-primary-600 space-y-1">
+                                <li>• Select your subject from the dropdown menu</li>
+                                <li>• Enter the subject-specific password</li>
+                                <li>• Click "Access Subject" to proceed to QR generation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface border-t border-secondary-200 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-text-secondary text-sm">
+                    © 2025 Student Attendance Manager. All Rights Reserved.
+                </p>
+                <p class="text-text-secondary text-xs mt-2">
+                    Secure QR Code Based Attendance System for Educational Institutions
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Change Password Modal (hidden by default) -->
+    <div id="changePwdModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 p-4">
+        <div class="bg-surface rounded-lg w-full max-w-md overflow-hidden">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-secondary-200">
+                <h3 class="font-medium">Change Subject Password</h3>
+                <button id="closeChangePwd" class="btn-ghost px-2 py-1" title="Close">×</button>
+            </div>
+            <div class="p-4">
+                <p id="changePwdIntro" class="text-sm text-text-secondary mb-3">
+                    You may change the password for the subject you just authenticated for. This will update the password for subsequent logins.
+                </p>
+
+                <form id="changePwdForm" class="space-y-4">
+                    <div>
+                        <label for="currentPwd" class="block text-sm font-medium text-text-primary">Current Password</label>
+                        <input id="currentPwd" name="currentPwd" type="password" class="input-field w-full" required />
+                    </div>
+                    <div>
+                        <label for="newPwd" class="block text-sm font-medium text-text-primary">New Password</label>
+                        <input id="newPwd" name="newPwd" type="password" class="input-field w-full" minlength="6" required />
+                    </div>
+                    <div>
+                        <label for="confirmPwd" class="block text-sm font-medium text-text-primary">Confirm New Password</label>
+                        <input id="confirmPwd" name="confirmPwd" type="password" class="input-field w-full" minlength="6" required />
+                    </div>
+
+                    <div id="changePwdError" class="text-sm text-error hidden"></div>
+                    <div id="changePwdSuccess" class="text-sm text-success hidden"></div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex space-x-2">
+                            <button type="submit" id="changePwdSubmit" class="btn-primary px-4 py-2">Update Password</button>
+                            <button type="button" id="changePwdSkip" class="btn-ghost px-4 py-2">Skip</button>
+                        </div>
+                        <button type="button" id="changePwdCancel" class="btn-ghost px-3 py-2">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Subject-password mapping (hardcoded for demo)
+    const subjectPasswords = {
+        'MAC': 'mac123',
+        'CC': 'cc456',
+        'UHV': 'uhv789',
+        'EP LAB': 'eplab012',
+        'IC': 'ic345',
+        'IPS': 'ips678',
+        'EECT': 'eect901',
+        'LIB': 'lib234',
+        'MM': 'mm567',
+        'CA': 'ca890'
+    };
+
+    // Load persisted subject passwords (if any)
+    try {
+        const persisted = JSON.parse(localStorage.getItem('subjectPasswords') || '{}');
+        Object.assign(subjectPasswords, persisted);
+    } catch (e) {
+        // ignore parse errors
+    }
+
+    // DOM elements (guard in case script runs before DOM - most elements are in the page)
+    const subjectSelect = document.getElementById('subject');
+    const passwordSection = document.getElementById('passwordSection');
+    const passwordInput = document.getElementById('password');
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const eyeIcon = document.getElementById('eyeIcon');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const errorText = document.getElementById('errorText');
+    const authForm = document.getElementById('authForm');
+
+    // Change password modal elements
+    const changePwdModal = document.getElementById('changePwdModal');
+    const changePwdForm = document.getElementById('changePwdForm');
+    const changePwdError = document.getElementById('changePwdError');
+    const changePwdSuccess = document.getElementById('changePwdSuccess');
+    const changePwdSkip = document.getElementById('changePwdSkip');
+    const changePwdCancel = document.getElementById('changePwdCancel');
+    const closeChangePwd = document.getElementById('closeChangePwd');
+
+    // Post-auth action elements
+    const postAuthActions = document.getElementById('postAuthActions');
+    const changePwdActionBtn = document.getElementById('changePwdActionBtn');
+    const continueBtn = document.getElementById('continueBtn');
+
+    // helper: safe query
+    function $(id) { return document.getElementById(id); }
+
+    // Update current date/time display
+    function updateDateTime() {
+        const now = new Date();
+        const options = {
+            year: 'numeric', month: 'long', day: 'numeric',
+            hour: 'numeric', minute: '2-digit', hour12: true
+        };
+        const el = $('currentDateTime');
+        if (el) el.textContent = now.toLocaleString('en-US', options);
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 60000);
+
+    // Toggle password field visibility
+    if (togglePasswordBtn && passwordInput && eyeIcon) {
+        togglePasswordBtn.addEventListener('click', function () {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+
+            // swap icon (simple toggle)
+            if (isPassword) {
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
+                `;
+            } else {
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                `;
+            }
+        });
+    }
+
+    // When subject selected -> enable password input
+    if (subjectSelect) {
+        subjectSelect.addEventListener('change', function () {
+            const selected = this.value;
+            if (selected) {
+                passwordSection.classList.remove('opacity-50');
+                passwordInput.disabled = false;
+                togglePasswordBtn.disabled = false;
+                passwordInput.focus();
+                // show/enable submit only if password already entered
+                if (passwordInput && passwordInput.value && passwordInput.value.trim().length > 0) {
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.disabled = true;
+                }
+                // hide any post-auth action from previous session
+                if (postAuthActions) postAuthActions.classList.add('hidden');
+                hideMessages();
+            } else {
+                passwordSection.classList.add('opacity-50');
+                passwordInput.disabled = true;
+                passwordInput.value = '';
+                togglePasswordBtn.disabled = true;
+                submitBtn.disabled = true;
+                hideMessages();
+            }
+        });
+    }
+
+    // Enable submit when teacher types password (and a subject is selected)
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function () {
+            const hasPwd = this.value && this.value.trim().length > 0;
+            const hasSubject = subjectSelect && subjectSelect.value;
+            submitBtn.disabled = !(hasPwd && hasSubject);
+        });
+    }
+
+    // Form submit (authenticate)
+    if (authForm) {
+        authForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const selectedSubject = subjectSelect ? subjectSelect.value : '';
+            const enteredPassword = passwordInput ? passwordInput.value : '';
+
+            if (!selectedSubject || !enteredPassword) {
+                showError('Please select a subject and enter password');
+                return;
+            }
+
+            setLoadingState(true);
+            hideMessages();
+
+            setTimeout(() => {
+                const correctPassword = subjectPasswords[selectedSubject];
+                if (enteredPassword === correctPassword) {
+                    showSuccess();
+                    sessionStorage.setItem('selectedSubject', selectedSubject);
+                    sessionStorage.setItem('authenticatedAt', new Date().toISOString());
+
+                    // show post-auth actions (change password or continue)
+                    setLoadingState(false);
+                    if (postAuthActions) postAuthActions.classList.remove('hidden');
+                    // disable submit to avoid duplicates until user chooses next step
+                    submitBtn.disabled = true;
+                } else {
+                    showError('Invalid password for ' + selectedSubject + '. Please try again.');
+                    setLoadingState(false);
+                }
+            }, 900);
+        });
+    }
+
+    // Change-password modal functions
+    function openChangePasswordModal(subject) {
+        if (!changePwdModal || !changePwdForm) return;
+        changePwdError.classList.add('hidden');
+        changePwdSuccess.classList.add('hidden');
+        changePwdForm.reset();
+        changePwdModal.classList.remove('hidden');
+        const intro = document.getElementById('changePwdIntro');
+        if (intro) intro.textContent = `You are authenticated for "${subject}". You can change the password for this subject now or skip to continue.`;
+    }
+    function closeChangePasswordModal() {
+        if (!changePwdModal) return;
+        changePwdModal.classList.add('hidden');
+    }
+
+    // Wire post-auth actions
+    if (changePwdActionBtn) {
+        changePwdActionBtn.addEventListener('click', () => {
+            const subject = sessionStorage.getItem('selectedSubject');
+            if (!subject) {
+                showError('Session expired. Please authenticate again.');
+                return;
+            }
+            if (postAuthActions) postAuthActions.classList.add('hidden');
+            openChangePasswordModal(subject);
+        });
+    }
+    if (continueBtn) {
+        continueBtn.addEventListener('click', () => {
+            window.location.href = 'qr_code_generation_management.html';
+        });
+    }
+
+    // Close/skip handlers for modal
+    if (changePwdSkip) {
+        changePwdSkip.addEventListener('click', () => {
+            closeChangePasswordModal();
+            window.location.href = 'qr_code_generation_management.html';
+        });
+    }
+    if (changePwdCancel) changePwdCancel.addEventListener('click', closeChangePasswordModal);
+    if (closeChangePwd) closeChangePwd.addEventListener('click', closeChangePasswordModal);
+
+    // Change password submit
+    if (changePwdForm) {
+        changePwdForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            changePwdError.classList.add('hidden');
+            changePwdSuccess.classList.add('hidden');
+
+            const subject = sessionStorage.getItem('selectedSubject');
+            if (!subject) {
+                changePwdError.textContent = 'Session expired. Please login again.';
+                changePwdError.classList.remove('hidden');
+                return;
+            }
+
+            const current = (document.getElementById('currentPwd') || {}).value || '';
+            const nw = (document.getElementById('newPwd') || {}).value || '';
+            const conf = (document.getElementById('confirmPwd') || {}).value || '';
+
+            if (current !== subjectPasswords[subject]) {
+                changePwdError.textContent = 'Current password is incorrect.';
+                changePwdError.classList.remove('hidden');
+                return;
+            }
+            if (nw.length < 6) {
+                changePwdError.textContent = 'New password must be at least 6 characters.';
+                changePwdError.classList.remove('hidden');
+                return;
+            }
+            if (nw !== conf) {
+                changePwdError.textContent = 'New password and confirmation do not match.';
+                changePwdError.classList.remove('hidden');
+                return;
+            }
+            if (nw === current) {
+                changePwdError.textContent = 'New password must be different from current password.';
+                changePwdError.classList.remove('hidden');
+                return;
+            }
+
+            subjectPasswords[subject] = nw;
+            try {
+                localStorage.setItem('subjectPasswords', JSON.stringify(subjectPasswords));
+            } catch (err) {
+                // ignore storage errors
+            }
+
+            changePwdSuccess.textContent = 'Password updated successfully. Redirecting...';
+            changePwdSuccess.classList.remove('hidden');
+            setTimeout(() => {
+                closeChangePasswordModal();
+                window.location.href = 'qr_code_generation_management.html';
+            }, 900);
+        });
+    }
+
+    // UI helpers
+    function setLoadingState(loading) {
+        if (!submitBtn || !submitText || !loadingSpinner) return;
+        if (loading) {
+            submitBtn.disabled = true;
+            submitText.textContent = 'Authenticating...';
+            loadingSpinner.classList.remove('hidden');
+        } else {
+            submitBtn.disabled = false;
+            submitText.textContent = 'Access Subject';
+            loadingSpinner.classList.add('hidden');
+        }
+    }
+
+    function showError(message) {
+        if (!errorMessage || !errorText) return;
+        errorText.textContent = message;
+        errorMessage.classList.remove('hidden');
+        successMessage.classList.add('hidden');
+        errorMessage.style.animation = 'shake 0.45s ease-in-out';
+        setTimeout(() => { errorMessage.style.animation = ''; }, 450);
+    }
+
+    function showSuccess() {
+        if (!successMessage || !errorMessage) return;
+        successMessage.classList.remove('hidden');
+        errorMessage.classList.add('hidden');
+    }
+
+    function hideMessages() {
+        if (errorMessage) errorMessage.classList.add('hidden');
+        if (successMessage) successMessage.classList.add('hidden');
+    }
+
+    // Add shake keyframes style
+    (function addStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%,100% { transform: translateX(0); }
+                25% { transform: translateX(-6px); }
+                75% { transform: translateX(6px); }
+            }
+        `;
+        document.head.appendChild(style);
+    })();
+
+    // Reset UI on page load
+    window.addEventListener('load', function () {
+        if (authForm) authForm.reset();
+        if (passwordSection) passwordSection.classList.add('opacity-50');
+        if (passwordInput) { passwordInput.disabled = true; passwordInput.value = ''; }
+        if (togglePasswordBtn) togglePasswordBtn.disabled = true;
+        if (submitBtn) submitBtn.disabled = true;
+        if (postAuthActions) postAuthActions.classList.add('hidden');
+        hideMessages();
+    });
+</script>
+<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+</body>
+</html>

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Attendance Submission - Student Attendance Manager</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- SheetJS CDN for Excel functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- jsQR for QR decoding from camera -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fstudentat4754back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.8"></script>
+</head>
+<body class="min-h-screen bg-background">
+    <!-- Global Header -->
+    <header class="bg-surface shadow-custom-sm border-b border-secondary-200">
+        <div class="max-width-8xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo and Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                        <svg class="h-8 w-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-semibold text-text-primary">Student Attendance Manager</h1>
+                        <p class="text-sm text-text-secondary">QR Code Based Attendance System</p>
+                    </div>
+                </div>
+                
+                <!-- Navigation Actions -->
+                <div class="flex items-center space-x-4">
+                    <a href="role_selection_landing.html" class="btn-secondary text-sm">
+                        <svg class="w-4 h-4 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        Back to Role Selection
+                    </a>
+                    
+                    <!-- Current Date/Time Display -->
+                    <div class="hidden sm:block">
+                        <div class="text-sm text-text-secondary">
+                            <span id="currentDateTime">August 30, 2025 - 5:13 PM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb Navigation -->
+    <nav class="bg-secondary-50 border-b border-secondary-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center space-x-2 py-3 text-sm">
+                <a href="role_selection_landing.html" class="text-text-secondary hover:text-primary transition-colors">Home</a>
+                <svg class="w-4 h-4 text-secondary-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                </svg>
+                <span class="text-text-primary font-medium">Student Portal</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 py-8 lg:py-12">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Page Header -->
+            <div class="text-center mb-8">
+                <div class="mx-auto w-16 h-16 bg-accent-50 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-semibold text-text-primary mb-2">Mark Your Attendance</h2>
+                <p class="text-lg text-text-secondary">Enter your details and attendance code to mark your presence</p>
+            </div>
+
+            <!-- Attendance Form Card -->
+            <div class="card mb-8">
+                <form id="attendanceForm" class="space-y-6">
+                    <!-- Student Name Field -->
+                    <div class="form-group">
+                        <label for="studentName" class="block text-sm font-medium text-text-primary mb-2">
+                            Student Name <span class="text-error">*</span>
+                        </label>
+                        <input type="text" id="studentName" name="studentName" class="input-field text-lg py-3" placeholder="Enter your full name" required autocomplete="name" />
+                        <div id="nameValidation" class="mt-1 text-sm hidden">
+                            <span class="text-success flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                Name looks good
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Application Number Field -->
+                    <div class="form-group">
+                        <label for="applicationNumber" class="block text-sm font-medium text-text-primary mb-2">
+                            Application Number <span class="text-error">*</span>
+                        </label>
+                        <input type="text" id="applicationNumber" name="applicationNumber" class="input-field text-lg py-3 font-mono" placeholder="Enter your application number" required pattern="[0-9A-Za-z]+" disabled />
+                        <div id="appNumberValidation" class="mt-1 text-sm hidden">
+                            <span class="text-success flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                Application number verified
+                            </span>
+                        </div>
+                        <p class="mt-1 text-xs text-text-secondary">Complete your name first to unlock this field</p>
+                    </div>
+
+                    <!-- Attendance Code Field -->
+                    <div class="form-group">
+                        <label for="attendanceCode" class="block text-sm font-medium text-text-primary mb-2">
+                            Attendance Code <span class="text-error">*</span>
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="attendanceCode" name="attendanceCode" class="input-field text-lg py-3 font-mono uppercase tracking-wider flex-1" placeholder="Enter attendance code" required maxlength="8" disabled />
+                            <button type="button" id="openScannerBtn" class="btn-ghost px-3 py-2" title="Scan QR to autofill code">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h4V3M21 7h-4V3M3 17h4v4M21 17h-4v4M7 7h10v10H7z"/>
+                                </svg>
+                                <span class="sr-only">Scan QR</span>
+                            </button>
+                        </div>
+                        <div id="codeValidation" class="mt-1 text-sm hidden">
+                            <span class="text-success flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                Code format is valid
+                            </span>
+                        </div>
+                        <p class="mt-1 text-xs text-text-secondary">Complete previous fields to unlock this field or use the QR scanner</p>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-4">
+                        <button type="submit" id="submitBtn" class="btn-success w-full py-4 text-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <span id="submitText">Mark Attendance</span>
+                            <div id="loadingSpinner" class="hidden inline-block ml-2">
+                                <div class="loading-spinner w-5 h-5"></div>
+                            </div>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Success Message -->
+                <div id="successMessage" class="hidden mt-6 alert-success">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-success mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <h4 class="font-medium text-success-800">Attendance Marked Successfully!</h4>
+                            <p class="mt-1 text-sm text-success-700" id="successDetails">
+                                Your attendance has been recorded for <span id="subjectName">Subject</span> at <span id="timestamp">5:13 PM on August 30, 2025</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="hidden mt-6 alert-error">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-error mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <h4 class="font-medium text-error-800">Attendance Submission Failed</h4>
+                            <p class="mt-1 text-sm text-error-700" id="errorDetails">
+                                Please check your attendance code and try again.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="card bg-secondary-50 border-secondary-200">
+                <div class="text-center mb-4">
+                    <h3 class="text-lg font-semibold text-text-primary mb-2">Need Help?</h3>
+                    <p class="text-text-secondary">Follow these simple steps to mark your attendance</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- QR Code Method -->
+                    <div class="text-center">
+                        <div class="mx-auto w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mb-3">
+                            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11a2 2 0 01-2 2H8a2 2 0 01-2-2V9a2 2 0 012-2h8a2 2 0 012 2v6zM8 9l8 8m0-8l-8 8"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-medium text-text-primary mb-2">QR Code Method</h4>
+                        <p class="text-sm text-text-secondary">Scan the QR code displayed by your teacher to automatically fill the attendance code</p>
+                    </div>
+                    
+                    <!-- Manual Entry Method -->
+                    <div class="text-center">
+                        <div class="mx-auto w-12 h-12 bg-accent-100 rounded-full flex items-center justify-center mb-3">
+                            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-medium text-text-primary mb-2">Manual Entry</h4>
+                        <p class="text-sm text-text-secondary">Enter the attendance code provided by your teacher along with your personal details</p>
+                    </div>
+                </div>
+                
+                <!-- Additional Help -->
+                <div class="mt-6 pt-6 border-t border-secondary-200">
+                    <div class="flex items-center justify-center text-sm text-text-secondary">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Having trouble? Ask your teacher for assistance with the attendance code</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface border-t border-secondary-200 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-text-secondary text-sm">
+                    © 2025 Student Attendance Manager. All Rights Reserved.
+                </p>
+                <p class="text-text-secondary text-xs mt-2">
+                    Secure QR Code Based Attendance System for Educational Institutions
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- QR Scanner Modal (hidden by default) -->
+    <div id="qrScanner" class="fixed inset-0 z-40 hidden items-center justify-center bg-black bg-opacity-50 p-4">
+        <div class="bg-surface rounded-lg w-full max-w-xl overflow-hidden">
+            <div class="flex items-center justify-between px-4 py-2 border-b border-secondary-200">
+                <h3 class="font-medium">Scan QR Code</h3>
+                <button id="closeScannerBtn" class="btn-ghost px-2 py-1" title="Close scanner">Close</button>
+            </div>
+            <div class="p-4">
+                <div class="relative">
+                    <video id="qrVideo" class="w-full rounded bg-black" playsinline></video>
+                    <canvas id="qrCanvas" class="hidden" style="display:none;"></canvas>
+                    <div id="qrOverlay" class="absolute inset-0 pointer-events-none"></div>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                    <div id="scannerStatus" class="text-sm text-text-secondary">Point the camera at the QR code</div>
+                    <div>
+                        <button id="stopScanBtn" class="btn-danger px-3 py-2">Stop</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // No pre-registered/demo student records or attendance codes.
+    // Keep these empty so the app starts clean. Real codes/subjects should come from server/admin UI.
+    const validCodes = []; // <-- empty: no pre-registered attendance codes
+    const codeSubjectMap = {}; // <-- empty mapping: populate from server when available
+
+    // Remove demo/pre-registered data from localStorage so the UI is clear on first load.
+    function clearDemoDataFromLocalStorage() {
+        try {
+            const keys = Object.keys(localStorage);
+            for (const k of keys) {
+                // remove any demo/demo-storage keys used by the app
+                if (k.startsWith('attendance_') || k === 'attendanceRecords' || k === 'lastAttendance' || k === 'subjectPasswords') {
+                    localStorage.removeItem(k);
+                }
+            }
+        } catch (err) {
+            console.error('Error clearing demo data:', err);
+        }
+    }
+
+    // --- Excel Export Functionality (unchanged) ---
+    function getMonthKey(date = new Date()){
+        // YYYYMM, e.g. 202508
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        return `${y}${m}`;
+    }
+
+    // Save a single attendance record into localStorage under a per-month bucket.
+    function saveAttendanceRecord(subject, attendanceData) {
+        try {
+            const monthKey = getMonthKey();
+            const storageKey = `attendance_${monthKey}`;
+            const raw = localStorage.getItem(storageKey);
+            const payload = raw ? JSON.parse(raw) : {};
+            if (!payload[subject]) payload[subject] = [];
+            payload[subject].push(attendanceData);
+            localStorage.setItem(storageKey, JSON.stringify(payload));
+            return { ok: true, monthKey };
+        } catch (err) {
+            console.error('saveAttendanceRecord error', err);
+            return { ok: false, error: err };
+        }
+    }
+
+    // Build a workbook containing one sheet per subject for the specified monthKey and trigger download.
+    function exportMonthlyWorkbook(monthKey) {
+        try {
+            const storageKey = `attendance_${monthKey}`;
+            const raw = localStorage.getItem(storageKey);
+            const payload = raw ? JSON.parse(raw) : {};
+            const wb = XLSX.utils.book_new();
+
+            const subjectNames = Object.keys(payload).sort();
+            if (subjectNames.length === 0) {
+                // nothing to export
+                return false;
+            }
+
+            subjectNames.forEach(subject => {
+                const rows = payload[subject];
+                // if records empty, still create an empty sheet with headers
+                const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{
+                    'Student Name': '',
+                    'Application Number': '',
+                    'Subject': subject,
+                    'Attendance Code': '',
+                    'Date & Time': '',
+                    'Submission ID': '',
+                    'Status': ''
+                }]);
+                // set reasonable column widths
+                ws['!cols'] = [
+                    { wch: 28 }, // Student Name
+                    { wch: 20 }, // Application Number
+                    { wch: 22 }, // Subject
+                    { wch: 20 }, // Attendance Code
+                    { wch: 28 }, // Date & Time
+                    { wch: 22 }, // Submission ID
+                    { wch: 12 }  // Status
+                ];
+                // sanitize sheet name (max 31 chars)
+                let sheetName = subject.toString().slice(0, 31);
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            });
+
+            const filename = `attendance_${monthKey}.xlsx`;
+            XLSX.writeFile(wb, filename);
+            return true;
+        } catch (err) {
+            console.error('exportMonthlyWorkbook error', err);
+            return false;
+        }
+    }
+
+    // Convenience wrapper used by submit handler: persist then export workbook for current month.
+    function persistAndExport(subject, attendanceData) {
+        const saved = saveAttendanceRecord(subject, attendanceData);
+        if (!saved.ok) {
+            showNotification('Failed to save attendance locally', 'error');
+            return false;
+        }
+        const ok = exportMonthlyWorkbook(saved.monthKey);
+        if (ok) {
+            showNotification('Attendance saved and monthly workbook updated', 'success');
+            return true;
+        } else {
+            showNotification('Attendance saved locally (export failed)', 'warning');
+            return false;
+        }
+    }
+
+    // Show notification function (unchanged)
+    function showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 px-4 py-3 rounded-md shadow-lg z-50 transition-all duration-300 ${
+            type === 'success' ? 'bg-success-100 text-success-800 border border-success-200' : 
+            type === 'error' ? 'bg-error-100 text-error-800 border border-error-200' : 
+            'bg-warning-100 text-warning-800 border border-warning-200'
+        }`;
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    ${type === 'success' ? 
+                        '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>' :
+                        type === 'error' ?
+                        '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>' :
+                        '<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>'
+                    }
+                </svg>
+                <span>${message}</span>
+            </div>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notification.parentNode) notification.parentNode.removeChild(notification);
+            }, 300);
+        }, 4000);
+    }
+
+    // Update current date and time (unchanged)
+    function updateDateTime() {
+        const now = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
+        document.getElementById('currentDateTime').textContent = now.toLocaleDateString('en-US', options);
+    }
+
+    // --- Progressive form enhancement (unchanged) ---
+    function setupProgressiveForm() {
+        const nameField = document.getElementById('studentName');
+        const appNumberField = document.getElementById('applicationNumber');
+        const codeField = document.getElementById('attendanceCode');
+        const submitBtn = document.getElementById('submitBtn');
+
+        nameField.addEventListener('input', function() {
+            const value = this.value.trim();
+            const nameValidation = document.getElementById('nameValidation');
+            if (value.length >= 2) {
+                this.classList.remove('input-error');
+                this.classList.add('input-success');
+                nameValidation.classList.remove('hidden');
+                appNumberField.disabled = false;
+                appNumberField.parentElement.querySelector('p').textContent = 'Enter your unique application number';
+            } else {
+                this.classList.remove('input-success');
+                nameValidation.classList.add('hidden');
+                appNumberField.disabled = true;
+                codeField.disabled = true;
+                submitBtn.disabled = true;
+            }
+            const words = value.split(' ');
+            const capitalizedWords = words.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+            if (capitalizedWords.join(' ') !== value) {
+                this.value = capitalizedWords.join(' ');
+            }
+        });
+
+        appNumberField.addEventListener('input', function() {
+            const value = this.value.trim();
+            const appValidation = document.getElementById('appNumberValidation');
+            if (value.length >= 4) {
+                this.classList.remove('input-error');
+                this.classList.add('input-success');
+                appValidation.classList.remove('hidden');
+                codeField.disabled = false;
+                codeField.parentElement.querySelector('p').textContent = 'Enter the code provided by your teacher';
+            } else {
+                this.classList.remove('input-success');
+                appValidation.classList.add('hidden');
+                codeField.disabled = true;
+                submitBtn.disabled = true;
+            }
+        });
+
+        codeField.addEventListener('input', function() {
+            const value = this.value.toUpperCase();
+            this.value = value;
+            const codeValidation = document.getElementById('codeValidation');
+            if (value.length >= 6) {
+                this.classList.remove('input-error');
+                this.classList.add('input-success');
+                codeValidation.classList.remove('hidden');
+                submitBtn.disabled = false;
+            } else {
+                this.classList.remove('input-success');
+                codeValidation.classList.add('hidden');
+                submitBtn.disabled = true;
+            }
+        });
+    }
+
+    // --- QR Camera Scanning Feature ---
+    let qrStream = null;
+    let qrScanning = false;
+    let qrAnimationFrame = null;
+
+    function openScanner() {
+        const scannerEl = document.getElementById('qrScanner');
+        scannerEl.classList.remove('hidden');
+        startScanner();
+    }
+
+    async function startScanner() {
+        const video = document.getElementById('qrVideo');
+        const canvas = document.getElementById('qrCanvas');
+        const status = document.getElementById('scannerStatus');
+
+        try {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showNotification('Camera not supported in this browser. Use manual entry.', 'error');
+                closeScanner();
+                return;
+            }
+
+            qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+            video.srcObject = qrStream;
+            // mute to allow autoplay in some browsers
+            video.muted = true;
+            video.playsInline = true;
+            await video.play();
+            qrScanning = true;
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            status.textContent = 'Scanning...';
+            tickScan();
+        } catch (err) {
+            console.error('Camera access error:', err);
+            showNotification('Unable to access camera. Please allow camera permissions or try manual entry.', 'error');
+            closeScanner();
+        }
+    }
+
+    function tickScan() {
+        const video = document.getElementById('qrVideo');
+        const canvas = document.getElementById('qrCanvas');
+        const status = document.getElementById('scannerStatus');
+
+        if (!qrScanning) return;
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            try {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "attemptBoth" });
+                if (code && code.data) {
+                    // QR content found
+                    handleScannedCode(code.data);
+                    return; // stop scanning once found
+                }
+            } catch (e) {
+                // ignore read errors
+            }
+        }
+        qrAnimationFrame = requestAnimationFrame(tickScan);
+    }
+
+    function stopScanner() {
+        qrScanning = false;
+        if (qrAnimationFrame) {
+            cancelAnimationFrame(qrAnimationFrame);
+            qrAnimationFrame = null;
+        }
+        if (qrStream) {
+            qrStream.getTracks().forEach(t => t.stop());
+            qrStream = null;
+        }
+    }
+
+    function closeScanner() {
+        stopScanner();
+        const scannerEl = document.getElementById('qrScanner');
+        scannerEl.classList.add('hidden');
+        document.getElementById('scannerStatus').textContent = 'Point the camera at the QR code';
+    }
+
+    function handleScannedCode(raw) {
+        // Try to extract an attendance-like token (alphanumeric)
+        const match = raw.match(/[A-Z0-9]{6,8}/i);
+        const code = match ? match[0].toUpperCase() : raw.trim().toUpperCase();
+        // Populate attendanceCode field if unlocked or unlock it
+        const codeField = document.getElementById('attendanceCode');
+        const appField = document.getElementById('applicationNumber');
+        const nameField = document.getElementById('studentName');
+
+        if (appField.disabled) {
+            showNotification('Please enter your name and application number first to proceed.', 'warning');
+            closeScanner();
+            return;
+        }
+
+        codeField.disabled = false;
+        codeField.value = code;
+        // Trigger input event so validation and submit enabling run
+        codeField.dispatchEvent(new Event('input', { bubbles: true }));
+
+        showNotification(`QR scanned: ${code}`, 'success');
+
+        // If scanned code is known and required fields are filled, auto-submit
+        const submitBtn = document.getElementById('submitBtn');
+        const studentNameVal = nameField.value.trim();
+        const appNumberVal = appField.value.trim();
+
+        if (validCodes.includes(code) && studentNameVal.length >= 2 && appNumberVal.length >= 1) {
+            // allow UI to update then programmatically trigger submit
+            setTimeout(() => {
+                // click submit button (will run existing submit handler)
+                if (!submitBtn.disabled) {
+                    submitBtn.click();
+                }
+            }, 300);
+        } else {
+            // close scanner if not auto-submitting
+            closeScanner();
+        }
+    }
+
+    // --- Form submission handling with Excel export (unchanged except small refactor to ensure code is uppercase) ---
+    function setupFormSubmission() {
+        const form = document.getElementById('attendanceForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitText = document.getElementById('submitText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitText.textContent = 'Processing...';
+            loadingSpinner.classList.remove('hidden');
+            successMessage.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+
+            const formData = new FormData(form);
+            const attendanceCode = formData.get('attendanceCode').toUpperCase();
+            const studentName = formData.get('studentName');
+            const appNumber = formData.get('applicationNumber');
+
+            setTimeout(() => {
+                if (validCodes.includes(attendanceCode)) {
+                    const subject = codeSubjectMap[attendanceCode];
+                    const now = new Date();
+                    const timestamp = now.toLocaleString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+                    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+                    const subjectCode = subject.match(/\(([^)]+)\)/)?.[1] || subject.split(' ')[0].toUpperCase();
+                    const submissionId = `ATT-${subjectCode}-${dateStr}-${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`;
+
+                    const attendanceData = {
+                        'Student Name': studentName,
+                        'Application Number': appNumber,
+                        'Subject': subject,
+                        'Attendance Code': attendanceCode,
+                        'Date & Time': timestamp,
+                        'Submission ID': submissionId,
+                        'Status': 'PRESENT'
+                    };
+
+                    persistAndExport(subject, attendanceData);
+
+                    localStorage.setItem('lastAttendance', JSON.stringify({
+                        studentName,
+                        applicationNumber: appNumber,
+                        subject,
+                        submissionId,
+                        timestamp
+                    }));
+
+                    document.getElementById('subjectName').textContent = subject;
+                    document.getElementById('timestamp').textContent = timestamp;
+
+                    const successDetails = document.getElementById('successDetails');
+                    successDetails.innerHTML = `
+                        Your attendance has been recorded for <span class="font-semibold">${subject}</span> at <span class="font-semibold">${timestamp}</span>
+                        <br><span class="text-success-600 text-xs mt-1 block">
+                            <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                            Data automatically saved to Excel sheet and downloaded
+                        </span>
+                    `;
+                    successMessage.classList.remove('hidden');
+
+                    setTimeout(() => {
+                        window.location.href = 'attendance_confirmation_status.html';
+                    }, 4000);
+
+                } else {
+                    document.getElementById('errorDetails').textContent =
+                        'Invalid attendance code. Please check with your teacher and try again.';
+                    errorMessage.classList.remove('hidden');
+                    submitBtn.disabled = false;
+                    submitText.textContent = 'Mark Attendance';
+                    loadingSpinner.classList.add('hidden');
+                }
+            }, 2000);
+        });
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        // clear any pre-populated/demo data so the page is clean
+        clearDemoDataFromLocalStorage();
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+        setupProgressiveForm();
+        setupFormSubmission();
+
+        // Wire scanner controls
+        document.getElementById('openScannerBtn').addEventListener('click', openScanner);
+        document.getElementById('closeScannerBtn').addEventListener('click', closeScanner);
+        document.getElementById('stopScanBtn').addEventListener('click', closeScanner);
+        // Close scanner on overlay click
+        document.getElementById('qrScanner').addEventListener('click', function(e) {
+            if (e.target === this) closeScanner();
+        });
+
+        // Show initial notification about Excel functionality
+        setTimeout(() => {
+            showNotification('Excel export ready! Your attendance will be automatically saved to Excel.', 'success');
+        }, 1000);
+    });
+</script>
+
+<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+</body>
+</html>
